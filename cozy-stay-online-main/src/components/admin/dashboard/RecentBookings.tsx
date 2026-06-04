@@ -23,14 +23,14 @@ const RecentBookings = ({ orders, loading }: RecentBookingsProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Bookings</CardTitle>
-        <CardDescription>Latest 5 bookings in the system</CardDescription>
+        <CardTitle>Recent Applications</CardTitle>
+        <CardDescription>Latest 5 room applications in the system</CardDescription>
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="text-center py-8">Loading bookings...</div>
+          <div className="text-center py-8">Loading applications...</div>
         ) : orders.length === 0 ? (
-          <div className="text-center py-8">No bookings found</div>
+          <div className="text-center py-8">No applications found</div>
         ) : (
           <div className="space-y-4">
             {orders.slice(0, 5).map((booking) => (
@@ -46,7 +46,7 @@ const RecentBookings = ({ orders, loading }: RecentBookingsProps) => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{booking.room_name}</p>
-                  <p className="text-sm text-gray-500 truncate">Guests: {booking.guests}</p>
+                  <p className="text-sm text-gray-500 truncate">Students: {booking.guests}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-medium">KSH {Number(booking.total_price).toLocaleString()}</p>

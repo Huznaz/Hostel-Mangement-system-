@@ -66,9 +66,9 @@ const Profile = () => {
       .eq('user_id', user!.id);
 
     if (error) {
-      toast({ title: 'Error', description: 'Could not cancel booking.', variant: 'destructive' });
+      toast({ title: 'Error', description: 'Could not cancel application.', variant: 'destructive' });
     } else {
-      toast({ title: 'Booking Cancelled', description: 'Your booking has been cancelled.' });
+      toast({ title: 'Application Cancelled', description: 'Your room application has been cancelled.' });
       fetchOrders();
     }
     setCancelling(null);
@@ -77,9 +77,9 @@ const Profile = () => {
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric' });
 
-  const nights = (checkIn: string, checkOut: string) => {
-    const diff = new Date(checkOut).getTime() - new Date(checkIn).getTime();
-    return Math.round(diff / (1000 * 60 * 60 * 24));
+  const months = (checkIn: string, checkOut: string) => {
+    const days = Math.round((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24));
+    return Math.max(1, Math.ceil(days / 30));
   };
 
   const activeBookings  = orders.filter(o => ['pending', 'confirmed'].includes(o.status));
@@ -113,7 +113,7 @@ const Profile = () => {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
-            { label: 'Total Bookings', value: orders.length },
+            { label: 'Total Applications', value: orders.length },
             { label: 'Active',         value: activeBookings.length },
             { label: 'Total Spent',    value: `KSH ${totalSpent.toLocaleString()}` },
           ].map(s => (
@@ -125,12 +125,12 @@ const Profile = () => {
         </div>
 
         {loading ? (
-          <div className="text-center py-20 text-gray-400">Loading your bookings…</div>
+          <div className="text-center py-20 text-gray-400">Loading your allocations…</div>
         ) : orders.length === 0 ? (
           <div className="bg-white rounded-2xl border shadow-sm p-12 text-center">
             <BedDouble className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-            <h2 className="text-lg font-semibold text-gray-700 mb-2">No bookings yet</h2>
-            <p className="text-gray-500 mb-6">Browse our rooms and make your first booking.</p>
+            <h2 className="text-lg font-semibold text-gray-700 mb-2">No applications yet</h2>
+            <p className="text-gray-500 mb-6">Browse available rooms and submit your first hostel application.</p>
             <Link to="/rooms">
               <Button className="bg-hotel-gold hover:bg-hotel-gold/90 text-white">Explore Rooms</Button>
             </Link>
@@ -140,7 +140,7 @@ const Profile = () => {
             {/* Active bookings */}
             {activeBookings.length > 0 && (
               <section className="mb-8">
-                <h2 className="text-lg font-semibold text-gray-800 mb-4">Active Bookings</h2>
+                <h2 className="text-lg font-semibold text-gray-800 mb-4">Active Allocations</h2>
                 <div className="space-y-4">
                   {activeBookings.map(order => (
                     <BookingCard
@@ -149,7 +149,7 @@ const Profile = () => {
                       onCancel={handleCancel}
                       cancelling={cancelling}
                       formatDate={formatDate}
-                      nights={nights}
+                      months={months}
                     />
                   ))}
                 </div>
@@ -159,7 +159,7 @@ const Profile = () => {
             {/* Past bookings */}
             {pastBookings.length > 0 && (
               <section>
-                <h2 className="text-lg font-semibold text-gray-800 mb-4">Past Bookings</h2>
+                <h2 className="text-lg font-semibold text-gray-800 mb-4">Past Allocations</h2>
                 <div className="space-y-4">
                   {pastBookings.map(order => (
                     <BookingCard
@@ -168,7 +168,7 @@ const Profile = () => {
                       onCancel={handleCancel}
                       cancelling={cancelling}
                       formatDate={formatDate}
-                      nights={nights}
+                      months={months}
                     />
                   ))}
                 </div>
@@ -186,12 +186,12 @@ interface CardProps {
   onCancel: (id: string) => void;
   cancelling: string | null;
   formatDate: (d: string) => string;
-  nights: (i: string, o: string) => number;
+  months: (i: string, o: string) => number;
 }
 
-const BookingCard = ({ order, onCancel, cancelling, formatDate, nights }: CardProps) => {
+const BookingCard = ({ order, onCancel, cancelling, formatDate, months }: CardProps) => {
   const s = statusConfig[order.status] ?? statusConfig['pending'];
-  const n = nights(order.check_in_date, order.check_out_date);
+  const n = months(order.check_in_date, order.check_out_date);
   const canCancel = order.status === 'pending';
 
   return (
@@ -212,14 +212,14 @@ const BookingCard = ({ order, onCancel, cancelling, formatDate, nights }: CardPr
             <div className="flex items-center gap-1.5">
               <CalendarDays className="h-4 w-4 text-gray-400" />
               <div>
-                <div className="text-xs text-gray-400">Check-in</div>
+                <div className="text-xs text-gray-400">Move-in</div>
                 <div className="font-medium">{formatDate(order.check_in_date)}</div>
               </div>
             </div>
             <div className="flex items-center gap-1.5">
               <CalendarDays className="h-4 w-4 text-gray-400" />
               <div>
-                <div className="text-xs text-gray-400">Check-out</div>
+                <div className="text-xs text-gray-400">Move-out</div>
                 <div className="font-medium">{formatDate(order.check_out_date)}</div>
               </div>
             </div>
@@ -227,13 +227,13 @@ const BookingCard = ({ order, onCancel, cancelling, formatDate, nights }: CardPr
               <Clock className="h-4 w-4 text-gray-400" />
               <div>
                 <div className="text-xs text-gray-400">Duration</div>
-                <div className="font-medium">{n} night{n !== 1 ? 's' : ''}</div>
+                <div className="font-medium">{n} month{n !== 1 ? 's' : ''}</div>
               </div>
             </div>
             <div className="flex items-center gap-1.5">
               <Users className="h-4 w-4 text-gray-400" />
               <div>
-                <div className="text-xs text-gray-400">Guests</div>
+                <div className="text-xs text-gray-400">Occupants</div>
                 <div className="font-medium">{order.guests}</div>
               </div>
             </div>
@@ -247,7 +247,7 @@ const BookingCard = ({ order, onCancel, cancelling, formatDate, nights }: CardPr
 
           <div className="mt-3 flex items-center gap-2 text-xs text-gray-400">
             <Receipt className="h-3 w-3" />
-            Booking ID: <span className="font-mono">{order.id.slice(0, 8)}…</span>
+            Application ID: <span className="font-mono">{order.id.slice(0, 8)}…</span>
             {order.payment_method && (
               <span className="ml-2 capitalize">· {order.payment_method}</span>
             )}

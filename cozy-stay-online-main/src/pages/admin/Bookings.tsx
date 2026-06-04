@@ -57,9 +57,9 @@ const BookingsPage = () => {
     setUpdating(id);
     const { error } = await supabase.from('orders').update({ status }).eq('id', id);
     if (error) {
-      toast({ title: 'Error', description: 'Failed to update booking.', variant: 'destructive' });
+      toast({ title: 'Error', description: 'Failed to update allocation.', variant: 'destructive' });
     } else {
-      toast({ title: `Booking ${status}`, description: `Booking has been ${status}.` });
+      toast({ title: `Allocation ${status}`, description: `Application has been ${status}.` });
       setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
     }
     setUpdating(null);
@@ -67,7 +67,7 @@ const BookingsPage = () => {
 
   const exportCSV = () => {
     const rows = [
-      ['ID', 'Room', 'Check In', 'Check Out', 'Guests', 'Price', 'Status', 'Payment', 'Booked On'],
+      ['ID', 'Room', 'Move In', 'Move Out', 'Occupants', 'Price', 'Status', 'Payment', 'Applied On'],
       ...filtered.map(o => [
         o.id.slice(0, 8), o.room_name, o.check_in_date, o.check_out_date,
         o.guests, o.total_price, o.status, o.payment_method || '', 
@@ -77,12 +77,12 @@ const BookingsPage = () => {
     const csv = rows.map(r => r.join(',')).join('\n');
     const a = document.createElement('a');
     a.href = 'data:text/csv,' + encodeURIComponent(csv);
-    a.download = 'bookings.csv';
+    a.download = 'allocations.csv';
     a.click();
   };
 
   const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric' });
-  const nights = (i: string, o: string) => Math.round((new Date(o).getTime() - new Date(i).getTime()) / 86400000);
+  const months = (i: string, o: string) => Math.max(1, Math.ceil(Math.round((new Date(o).getTime() - new Date(i).getTime()) / 86400000) / 30));
 
   const filtered = orders.filter(o => {
     const matchSearch = o.room_name.toLowerCase().includes(search.toLowerCase()) || o.id.includes(search);
@@ -100,7 +100,7 @@ const BookingsPage = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Bookings</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Room Allocations</h1>
         <Button onClick={exportCSV} variant="outline" size="sm" className="gap-2">
           <Download className="h-4 w-4" /> Export CSV
         </Button>
@@ -109,7 +109,7 @@ const BookingsPage = () => {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Bookings', value: stats.total, color: 'text-gray-900' },
+          { label: 'Total Applications', value: stats.total, color: 'text-gray-900' },
           { label: 'Pending',        value: stats.pending, color: 'text-yellow-600' },
           { label: 'Confirmed',      value: stats.confirmed, color: 'text-green-600' },
           { label: 'Total Revenue',  value: `KSH ${stats.revenue.toLocaleString()}`, color: 'text-hotel-gold' },
@@ -128,7 +128,7 @@ const BookingsPage = () => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Search by room or booking ID..."
+            placeholder="Search by room or application ID..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="pl-9"
@@ -152,14 +152,14 @@ const BookingsPage = () => {
       <Card>
         <CardContent className="p-0">
           {loading ? (
-            <div className="text-center py-16 text-gray-400">Loading bookings...</div>
+            <div className="text-center py-16 text-gray-400">Loading allocations...</div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-16 text-gray-400">No bookings found.</div>
+            <div className="text-center py-16 text-gray-400">No allocations found.</div>
           ) : (
             <div className="divide-y">
               {filtered.map(order => {
                 const s = statusConfig[order.status] ?? statusConfig['pending'];
-                const n = nights(order.check_in_date, order.check_out_date);
+                const n = months(order.check_in_date, order.check_out_date);
                 const busy = updating === order.id;
                 return (
                   <div key={order.id} className="p-4 hover:bg-gray-50 transition-colors">
@@ -178,11 +178,11 @@ const BookingsPage = () => {
                           <span className="flex items-center gap-1">
                             <CalendarDays className="h-3.5 w-3.5 text-gray-400" />
                             {fmtDate(order.check_in_date)} → {fmtDate(order.check_out_date)}
-                            <span className="text-gray-400">({n} night{n !== 1 ? 's' : ''})</span>
+                            <span className="text-gray-400">({n} month{n !== 1 ? 's' : ''})</span>
                           </span>
                           <span className="flex items-center gap-1">
                             <Users className="h-3.5 w-3.5 text-gray-400" />
-                            {order.guests} guest{order.guests !== 1 ? 's' : ''}
+                            {order.guests} student{order.guests !== 1 ? 's' : ''}
                           </span>
                           <span className="flex items-center gap-1">
                             <Receipt className="h-3.5 w-3.5 text-gray-400" />

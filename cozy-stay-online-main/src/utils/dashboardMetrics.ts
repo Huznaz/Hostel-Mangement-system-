@@ -1,5 +1,5 @@
 
-import { rooms } from '@/data/hotelData';
+import { rooms } from '@/data/hostelData';
 
 interface Order {
   id: string;

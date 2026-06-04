@@ -16,7 +16,7 @@ const BookingsChart = ({ data }: BookingsChartProps) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
-          <Tooltip formatter={(value) => [`${value}`, 'Bookings']} />
+          <Tooltip formatter={(value) => [`${value}`, 'Applications']} />
           <Line 
             type="monotone" 
             dataKey="value" 

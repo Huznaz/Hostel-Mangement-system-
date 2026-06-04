@@ -13,8 +13,8 @@ const GuestStats = ({ totalGuests, averageStay, averageSpend, totalOrders }: Gue
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Guest Statistics</CardTitle>
-        <CardDescription>Current guest information</CardDescription>
+        <CardTitle>Student Statistics</CardTitle>
+        <CardDescription>Current resident information</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
@@ -24,7 +24,7 @@ const GuestStats = ({ totalGuests, averageStay, averageSpend, totalOrders }: Gue
                 <Users size={20} />
               </div>
               <div>
-                <p className="font-medium">Total Guests</p>
+                <p className="font-medium">Total Students</p>
                 <p className="text-sm text-gray-500">Currently staying</p>
               </div>
             </div>
@@ -51,7 +51,7 @@ const GuestStats = ({ totalGuests, averageStay, averageSpend, totalOrders }: Gue
               </div>
               <div>
                 <p className="font-medium">Average Spend</p>
-                <p className="text-sm text-gray-500">Per booking</p>
+                <p className="text-sm text-gray-500">Per application</p>
               </div>
             </div>
             <p className="text-xl font-bold">

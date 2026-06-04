@@ -9,8 +9,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Label } from "@/components/ui/label";
 import { validateEmail } from '@/utils/emailValidation';
+import { HOSTEL_NAME } from '@/constants/brand';
 
-const Auth = () => {
+interface AuthProps {
+  /** Standalone admin portal: sign-in only, no student registration. */
+  adminPortal?: boolean;
+}
+
+const Auth = ({ adminPortal = false }: AuthProps) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -202,10 +208,50 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Welcome to CozyStay</CardTitle>
-          <CardDescription>Sign in or create an account to continue</CardDescription>
+          <CardTitle className="text-2xl font-bold">
+            {adminPortal ? `${HOSTEL_NAME} Admin` : `Welcome to ${HOSTEL_NAME}`}
+          </CardTitle>
+          <CardDescription>
+            {adminPortal
+              ? "Staff sign in — admin accounts must be listed in admin_users"
+              : "Student login — manage your room applications and allocations"}
+          </CardDescription>
         </CardHeader>
         <CardContent>
+          {adminPortal ? (
+            <form onSubmit={handleSignIn} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="signin-email">Email</Label>
+                <Input
+                  id="signin-email"
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={handleEmailChange}
+                  onBlur={handleEmailBlur}
+                  className={emailError ? "border-red-500" : ""}
+                  required
+                />
+                {emailError && (
+                  <p className="text-sm text-red-500">{emailError}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="signin-password">Password</Label>
+                <Input
+                  id="signin-password"
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading || !!emailError}>
+                {loading ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </form>
+          ) : (
           <Tabs defaultValue="signin" className="space-y-4">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
@@ -283,6 +329,7 @@ const Auth = () => {
               </form>
             </TabsContent>
           </Tabs>
+          )}
         </CardContent>
       </Card>
     </div>

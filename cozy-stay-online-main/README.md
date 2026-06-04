@@ -1,73 +1,65 @@
-# Welcome to your Lovable project
+# CampusStay — Student Hostel Management System
 
-## Project info
+A web application for managing student hostel rooms, applications, and allocations. Built with React, TypeScript, Vite, Tailwind CSS, shadcn/ui, and Supabase.
 
-**URL**: https://lovable.dev/projects/717bc965-b863-403a-a153-ef95c7031bd8
+## Features
 
-## How can I edit this code?
+- **Students**: Browse rooms/beds, submit semester applications (move-in/out dates), track allocations in profile
+- **Admin**: Dashboard, room CRUD, approve/reject applications, student directory, hostel settings
+- **Room types**: Dormitories, shared rooms, private rooms, female-only wing, accessible rooms
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/717bc965-b863-403a-a153-ef95c7031bd8) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Run locally
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+cd cozy-stay-online-main
+npm install
 ```
 
-**Edit a file directly in GitHub**
+### Separate user and admin apps (recommended)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Run each interface in its own terminal:
 
-**Use GitHub Codespaces**
+```sh
+# Terminal 1 — student / public site (port 8080)
+npm run dev:user
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Terminal 2 — admin dashboard (port 8081)
+npm run dev:admin
+```
 
-## What technologies are used for this project?
+- **User site:** http://localhost:8080  
+- **Admin site:** http://localhost:8081 (sign in with an `admin_users` account)
 
-This project is built with:
+`npm run dev` is the same as `dev:user`. Admin links on the user site open the admin URL in a new tab when the apps are split.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Combined app (legacy single server)
 
-## How can I deploy this project?
+```sh
+npm run dev:all
+```
 
-Simply open [Lovable](https://lovable.dev/projects/717bc965-b863-403a-a153-ef95c7031bd8) and click on Share -> Publish.
+Serves both public pages and `/admin` on http://localhost:8080.
 
-## Can I connect a custom domain to my Lovable project?
+### Production builds
 
-Yes, you can!
+```sh
+npm run build:user   # dist/index.html
+npm run build:admin  # dist/admin.html
+npm run build:all    # both entry points
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Tech stack
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- Vite + React + TypeScript
+- Supabase (auth, `orders`, `rooms`, `profiles`, `admin_users`, `hotel_settings`)
+- TanStack Query, React Router, Recharts
+
+## Branding
+
+Edit `src/constants/brand.ts` to change the hostel name and contact details.
+
+Room catalog: `src/data/hostelData.ts`
+
+## Admin access
+
+Users must have a row in the `admin_users` table (id = their auth user UUID) to access `/admin`.

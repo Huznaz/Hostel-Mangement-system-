@@ -23,7 +23,7 @@ const DashboardCharts = ({ revenueData, bookingData, roomOccupancyData }: Dashbo
         <h2 className="text-2xl font-serif font-bold">Analytics</h2>
         <TabsList>
           <TabsTrigger value="revenue">Revenue</TabsTrigger>
-          <TabsTrigger value="bookings">Bookings</TabsTrigger>
+          <TabsTrigger value="bookings">Applications</TabsTrigger>
           <TabsTrigger value="occupancy">Occupancy</TabsTrigger>
         </TabsList>
       </div>
@@ -36,7 +36,7 @@ const DashboardCharts = ({ revenueData, bookingData, roomOccupancyData }: Dashbo
           </TabsContent>
           
           <TabsContent value="bookings" className="mt-0">
-            <h3 className="text-lg font-medium mb-4">Monthly Bookings (2025)</h3>
+            <h3 className="text-lg font-medium mb-4">Monthly Applications</h3>
             <BookingsChart data={bookingData} />
           </TabsContent>
           

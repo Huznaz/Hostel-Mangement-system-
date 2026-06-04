@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { validateEmail } from '@/utils/emailValidation';
+import { HOSTEL_EMAIL, HOSTEL_PHONE, HOSTEL_LOCATION } from '@/constants/brand';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -77,10 +78,10 @@ const Contact = () => {
       <div className="bg-hotel-beige py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-4">Contact Us</h1>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-4">Contact the Warden</h1>
             <div className="w-24 h-1 bg-hotel-gold mx-auto mb-6"></div>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              We'd love to hear from you. Get in touch with us for any inquiries or to book your stay directly.
+              Questions about room applications, allocations, or semester fees? Reach our hostel office.
             </p>
           </div>
         </div>
@@ -172,7 +173,7 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold mb-1">Our Location</h3>
-                      <p className="text-gray-600">Nairobi, Kenya</p>
+                      <p className="text-gray-600">{HOSTEL_LOCATION}</p>
                     </div>
                   </div>
                   
@@ -182,7 +183,7 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold mb-1">Phone Numbers</h3>
-                      <p className="text-gray-600">WhatsApp/Call: +254 769 505 440</p>
+                      <p className="text-gray-600">WhatsApp/Call: {HOSTEL_PHONE}</p>
                     </div>
                   </div>
                   
@@ -192,8 +193,8 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold mb-1">Email Addresses</h3>
-                      <p className="text-gray-600">Reservations: reservations@cozystay.com</p>
-                      <p className="text-gray-600">Customer Service: info@cozystay.com</p>
+                      <p className="text-gray-600">Allocations: {HOSTEL_EMAIL}</p>
+                      <p className="text-gray-600">General enquiries: {HOSTEL_EMAIL}</p>
                     </div>
                   </div>
                   
@@ -203,9 +204,9 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold mb-1">Operating Hours</h3>
-                      <p className="text-gray-600">Reception: 24/7</p>
-                      <p className="text-gray-600">Restaurant: 6:30 AM - 10:30 PM</p>
-                      <p className="text-gray-600">Spa: 9:00 AM - 9:00 PM</p>
+                      <p className="text-gray-600">Reception / Warden: 24/7</p>
+                      <p className="text-gray-600">Meals: 6:30 AM - 9:00 PM</p>
+                      <p className="text-gray-600">Office: Mon–Fri 8:00 AM - 5:00 PM</p>
                     </div>
                   </div>
                 </div>

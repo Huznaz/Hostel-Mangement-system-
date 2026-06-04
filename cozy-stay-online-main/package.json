@@ -4,11 +4,19 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode user",
+    "dev:user": "vite --mode user",
+    "dev:admin": "vite --mode admin",
+    "dev:all": "vite --mode full",
     "build": "vite build",
+    "build:user": "vite build --mode user",
+    "build:admin": "vite build --mode admin",
+    "build:all": "vite build --mode full",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:user": "vite preview --mode user",
+    "preview:admin": "vite preview --mode admin --port 8081"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

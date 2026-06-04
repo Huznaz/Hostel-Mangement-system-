@@ -4,12 +4,12 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import RoomFilters, { FilterValues } from '@/components/rooms/RoomFilters';
 import RoomList from '@/components/rooms/RoomList';
-import { rooms as baseRooms } from '@/data/hotelData';
+import { rooms as baseRooms, PRICE_MIN, PRICE_MAX } from '@/data/hostelData';
 import { supabase } from '@/integrations/supabase/client';
 
 const Rooms = () => {
   const [filters, setFilters] = useState<FilterValues>({
-    priceRange: [2200, 8500],
+    priceRange: [PRICE_MIN, PRICE_MAX],
     capacity: 1,
     breakfast: false,
     pets: false
@@ -105,10 +105,10 @@ const Rooms = () => {
       <div className="bg-hotel-beige py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-4">Our Luxurious Rooms</h1>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-4">Student Rooms & Beds</h1>
             <div className="w-24 h-1 bg-hotel-gold mx-auto mb-6"></div>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Discover our selection of comfortable and elegant rooms designed for your perfect stay
+              Browse dormitories, shared rooms, and private allocations. Apply online for your semester stay.
             </p>
           </div>
         </div>
@@ -125,15 +125,15 @@ const Rooms = () => {
               </h2>
               {loading ? (
                 <div className="flex items-center justify-center py-8">
-                  <span>Loading available rooms...</span>
+                  <span>Loading available allocations...</span>
                 </div>
               ) : (
                 <RoomList rooms={filteredRooms} />
               )}
               {filteredRooms.length === 0 && !loading && (
                 <div className="text-center py-12 bg-white rounded-lg shadow">
-                  <h3 className="text-xl font-medium text-gray-700 mb-2">No rooms available</h3>
-                  <p className="text-gray-500">Try adjusting your filters or check back later.</p>
+                  <h3 className="text-xl font-medium text-gray-700 mb-2">No rooms available this semester</h3>
+                  <p className="text-gray-500">Try adjusting your filters or contact the warden for the waitlist.</p>
                 </div>
               )}
             </div>

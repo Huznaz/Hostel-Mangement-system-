@@ -34,7 +34,7 @@ const Map = () => {
       // Add marker for hotel location
       new mapboxgl.Marker()
         .setLngLat(nairobiCoordinates)
-        .setPopup(new mapboxgl.Popup({ offset: 25 }).setText('ZamZam Hostel'))
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setText('CampusStay Student Hostel'))
         .addTo(map.current);
     } catch (error) {
       console.error('Error initializing map:', error);

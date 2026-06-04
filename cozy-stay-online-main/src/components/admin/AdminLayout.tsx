@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Hotel, CalendarDays, Users, 
   Settings, LogOut, Menu, X
@@ -17,6 +17,16 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { HOSTEL_NAME } from '@/constants/brand';
+import {
+  adminRoute,
+  isAdminRouteActive,
+  activeAdminSegment,
+  adminPageTitle,
+  type AdminSegment,
+  userAppUrl,
+  isAdminApp,
+} from '@/config/appMode';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -40,54 +50,51 @@ const NavItem = ({ icon, label, href, isActive }: NavItemProps) => (
   </Link>
 );
 
+const NAV_ITEMS: { segment: AdminSegment; icon: React.ReactNode; label: string }[] = [
+  { segment: '', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
+  { segment: 'rooms', icon: <Hotel size={20} />, label: 'Rooms' },
+  { segment: 'bookings', icon: <CalendarDays size={20} />, label: 'Allocations' },
+  { segment: 'guests', icon: <Users size={20} />, label: 'Students' },
+  { segment: 'settings', icon: <Settings size={20} />, label: 'Settings' },
+];
+
 const AdminLayout = () => {
   const location = useLocation();
   const { user, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pageTitle = adminPageTitle[activeAdminSegment(location.pathname)];
   
-  const isActive = (path: string) => location.pathname === path;
+  const navLinks = NAV_ITEMS.map((item) => (
+    <NavItem
+      key={item.segment || 'dashboard'}
+      icon={item.icon}
+      label={item.label}
+      href={adminRoute(item.segment)}
+      isActive={isAdminRouteActive(location.pathname, item.segment)}
+    />
+  ));
   
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar for desktop */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r p-4 flex-shrink-0">
         <div className="flex items-center gap-2 px-2 py-3 mb-6">
-          <span className="text-xl font-serif font-bold text-hotel-gold">CozyStay</span>
+          <span className="text-xl font-serif font-bold text-hotel-gold">{HOSTEL_NAME}</span>
           <span className="text-sm font-medium text-gray-500">Admin</span>
         </div>
         
-        <nav className="space-y-1 flex-1">
-          <NavItem 
-            icon={<LayoutDashboard size={20} />} 
-            label="Dashboard" 
-            href="/admin" 
-            isActive={isActive('/admin')} 
-          />
-          <NavItem 
-            icon={<Hotel size={20} />} 
-            label="Rooms" 
-            href="/admin/rooms" 
-            isActive={isActive('/admin/rooms')} 
-          />
-          <NavItem 
-            icon={<CalendarDays size={20} />} 
-            label="Bookings" 
-            href="/admin/bookings" 
-            isActive={isActive('/admin/bookings')} 
-          />
-          <NavItem 
-            icon={<Users size={20} />} 
-            label="Guests" 
-            href="/admin/guests" 
-            isActive={isActive('/admin/guests')} 
-          />
-          <NavItem 
-            icon={<Settings size={20} />} 
-            label="Settings" 
-            href="/admin/settings" 
-            isActive={isActive('/admin/settings')} 
-          />
-        </nav>
+        <nav className="space-y-1 flex-1">{navLinks}</nav>
+
+        {isAdminApp && (
+          <a
+            href={userAppUrl}
+            className="text-sm text-hotel-gold hover:underline px-3 py-2 block"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View student site →
+          </a>
+        )}
         
         <Button 
           variant="outline" 
@@ -114,7 +121,7 @@ const AdminLayout = () => {
       )}>
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-serif font-bold text-hotel-gold">CozyStay</span>
+            <span className="text-xl font-serif font-bold text-hotel-gold">{HOSTEL_NAME}</span>
             <span className="text-sm font-medium text-gray-500">Admin</span>
           </div>
           <button 
@@ -125,38 +132,7 @@ const AdminLayout = () => {
           </button>
         </div>
         
-        <nav className="p-4 space-y-1">
-          <NavItem 
-            icon={<LayoutDashboard size={20} />} 
-            label="Dashboard" 
-            href="/admin" 
-            isActive={isActive('/admin')} 
-          />
-          <NavItem 
-            icon={<Hotel size={20} />} 
-            label="Rooms" 
-            href="/admin/rooms" 
-            isActive={isActive('/admin/rooms')} 
-          />
-          <NavItem 
-            icon={<CalendarDays size={20} />} 
-            label="Bookings" 
-            href="/admin/bookings" 
-            isActive={isActive('/admin/bookings')} 
-          />
-          <NavItem 
-            icon={<Users size={20} />} 
-            label="Guests" 
-            href="/admin/guests" 
-            isActive={isActive('/admin/guests')} 
-          />
-          <NavItem 
-            icon={<Settings size={20} />} 
-            label="Settings" 
-            href="/admin/settings" 
-            isActive={isActive('/admin/settings')} 
-          />
-        </nav>
+        <nav className="p-4 space-y-1">{navLinks}</nav>
         
         <Button 
           variant="outline" 
@@ -179,13 +155,7 @@ const AdminLayout = () => {
             >
               <Menu size={20} />
             </button>
-            <h1 className="text-xl font-medium">
-              {isActive('/admin') && 'Dashboard'}
-              {isActive('/admin/rooms') && 'Room Management'}
-              {isActive('/admin/bookings') && 'Booking Management'}
-              {isActive('/admin/guests') && 'Guest Management'}
-              {isActive('/admin/settings') && 'Settings'}
-            </h1>
+            <h1 className="text-xl font-medium">{pageTitle}</h1>
           </div>
           
           <DropdownMenu>

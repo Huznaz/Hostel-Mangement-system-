@@ -60,7 +60,7 @@ const AdminGuests = () => {
     const emailMap: Record<string, string> = {};
     if (profilesData) {
       profilesData.forEach((p: any) => {
-        emailMap[p.id] = p.username || 'Guest';
+        emailMap[p.id] = p.username || 'Student';
       });
     }
 
@@ -108,10 +108,10 @@ const AdminGuests = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Guests</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Students</h1>
         <div className="flex gap-3 text-sm">
           <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
-            {guests.length} Total Guests
+            {guests.length} Total Students
           </span>
           <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium">
             {activeGuests} Currently Active
@@ -124,7 +124,7 @@ const AdminGuests = () => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Search guests, rooms..."
+            placeholder="Search students, rooms..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="pl-9"
@@ -145,9 +145,9 @@ const AdminGuests = () => {
       </div>
 
       {loading ? (
-        <div className="text-center py-16 text-gray-400">Loading guests...</div>
+        <div className="text-center py-16 text-gray-400">Loading students...</div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">No guests found.</div>
+        <div className="text-center py-16 text-gray-400">No students found.</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map(guest => {
@@ -174,7 +174,7 @@ const AdminGuests = () => {
                   <div className="grid grid-cols-2 gap-2 mb-3">
                     <div className="bg-gray-50 rounded-lg p-2 text-center">
                       <div className="text-lg font-bold text-gray-900">{guest.totalBookings}</div>
-                      <div className="text-xs text-gray-400">Bookings</div>
+                      <div className="text-xs text-gray-400">Applications</div>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-2 text-center">
                       <div className="text-sm font-bold text-hotel-gold">KSH {guest.totalSpent.toLocaleString()}</div>
@@ -202,13 +202,13 @@ const AdminGuests = () => {
                       </div>
                       <div className="text-xs text-gray-500 flex items-center gap-1">
                         <Users className="h-3 w-3" />
-                        {active.guests} guest{active.guests > 1 ? 's' : ''}
+                        {active.guests} student{active.guests > 1 ? 's' : ''}
                         <span className="ml-auto font-medium text-gray-700">KSH {active.total_price.toLocaleString()}</span>
                       </div>
                     </div>
                   ) : (
                     <div className="border border-gray-100 bg-gray-50 rounded-lg p-3 text-center">
-                      <p className="text-xs text-gray-400">No active booking</p>
+                      <p className="text-xs text-gray-400">No active allocation</p>
                       <p className="text-xs text-gray-400">Last: <span className="text-gray-600">{guest.lastBooking.room_name}</span></p>
                     </div>
                   )}

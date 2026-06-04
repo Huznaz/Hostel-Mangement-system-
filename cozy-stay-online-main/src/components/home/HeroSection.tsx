@@ -2,21 +2,22 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { HOSTEL_NAME, HOSTEL_TAGLINE } from '@/constants/brand';
 
 const HeroSection = () => {
   return (
     <div className="hero-section h-screen flex items-center justify-center text-center text-white">
       <div className="animate-fade-in space-y-6 px-4">
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold leading-tight">
-          Welcome to <br /><span className="text-hotel-gold">ZamZam</span>
+          Welcome to <br /><span className="text-hotel-gold">{HOSTEL_NAME}</span>
         </h1>
         <p className="text-xl md:text-2xl max-w-3xl mx-auto">
-          Where travelers become friends and adventures begin
+          {HOSTEL_TAGLINE}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
           <Link to="/rooms">
             <Button size="lg" className="bg-hotel-gold hover:bg-amber-600 text-white">
-              Browse Rooms
+              Browse Rooms & Beds
             </Button>
           </Link>
           <Link to="/contact">

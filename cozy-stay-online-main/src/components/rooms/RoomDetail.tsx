@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Room, rooms } from '@/data/hotelData';
+import { Room, rooms } from '@/data/hostelData';
+import RoomImage from '@/components/rooms/RoomImage';
 import { Wifi, Coffee, Utensils, CheckCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,9 +31,11 @@ const RoomDetail = () => {
   const { user } = useAuth();
   
   const [checkInDate, setCheckInDate] = useState<Date | undefined>(new Date());
-  const [checkOutDate, setCheckOutDate] = useState<Date | undefined>(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000));
+  const [checkOutDate, setCheckOutDate] = useState<Date | undefined>(new Date(Date.now() + 120 * 24 * 60 * 60 * 1000));
   const [adults, setAdults] = useState<string>("1");
   const [guestName, setGuestName] = useState("");
+  const [studentId, setStudentId] = useState("");
+  const [university, setUniversity] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [isBooking, setIsBooking] = useState(false);
@@ -67,11 +70,13 @@ const RoomDetail = () => {
     );
   }
   
-  const calculateTotalPrice = () => {
-    if (!checkInDate || !checkOutDate) return room.price;
+  const calculateMonths = () => {
+    if (!checkInDate || !checkOutDate) return 1;
     const days = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
-    return room.price * Math.max(1, days);
+    return Math.max(1, Math.ceil(days / 30));
   };
+
+  const calculateTotalPrice = () => room.price * calculateMonths();
 
   const handleBookRoom = async () => {
     try {
@@ -84,10 +89,10 @@ const RoomDetail = () => {
         return;
       }
 
-      if (!guestName || !email || !phone) {
+      if (!guestName || !email || !phone || !studentId || !university) {
         toast({
           title: "Missing information",
-          description: "Please fill in all contact details",
+          description: "Please fill in all student and contact details",
           variant: "destructive",
         });
         return;
@@ -114,21 +119,26 @@ const RoomDetail = () => {
         .insert({
           room_id: room.id,
           room_name: room.name,
-          user_id: user?.id || '00000000-0000-0000-0000-000000000000', // Use guest ID if not logged in
+          user_id: user?.id || '00000000-0000-0000-0000-000000000000',
           check_in_date: checkInDateString,
           check_out_date: checkOutDateString,
           guests: totalGuests,
           total_price: totalPrice,
           status: 'pending',
-          payment_method: 'pay_at_hotel',
-          special_requests: ''
+          payment_method: 'pay_at_hostel',
+          student_id: studentId,
+          university,
+          contact_name: guestName,
+          contact_email: email,
+          contact_phone: phone,
+          special_requests: null,
         })
         .select();
       
       if (error) {
         console.error('Booking error:', error);
         toast({
-          title: "Booking Failed",
+          title: "Application Failed",
           description: error.message,
           variant: "destructive",
         });
@@ -138,8 +148,8 @@ const RoomDetail = () => {
       
       // Show success message
       toast({
-        title: "Booking Successful!",
-        description: `Your stay at ${room.name} has been booked. Booking ID: ${data[0].id.slice(0, 8)}`,
+        title: "Application Submitted!",
+        description: `Your room application for ${room.name} is pending approval. Ref: ${data[0].id.slice(0, 8)}`,
         variant: "default",
       });
       
@@ -151,7 +161,7 @@ const RoomDetail = () => {
       console.error('Booking error:', error);
       toast({
         title: "Booking Failed",
-        description: "There was an error processing your booking. Please try again.",
+        description: "There was an error submitting your application. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -167,7 +177,7 @@ const RoomDetail = () => {
           <h1 className="text-3xl font-serif font-bold mb-2">{room.name}</h1>
           <div className="flex flex-wrap gap-2 mb-6">
             <Badge variant="outline" className="bg-hotel-beige/50">
-              {room.capacity} {room.capacity === 1 ? 'Guest' : 'Guests'}
+              {room.capacity} {room.capacity === 1 ? 'Student' : 'Students'}
             </Badge>
             <Badge variant="outline" className="bg-hotel-beige/50">
               {room.size} m²
@@ -177,12 +187,12 @@ const RoomDetail = () => {
             </Badge>
             {room.breakfast && (
               <Badge className="bg-hotel-gold text-white">
-                Breakfast Included
+                Meals Plan
               </Badge>
             )}
             {room.pets && (
               <Badge variant="outline" className="bg-hotel-beige/50">
-                Pets Allowed
+                Private Bathroom
               </Badge>
             )}
           </div>
@@ -193,10 +203,11 @@ const RoomDetail = () => {
               {room.images.map((image, index) => (
                 <CarouselItem key={index}>
                   <div className="aspect-[16/9] overflow-hidden rounded-lg">
-                    <img 
-                      src={image} 
+                    <RoomImage
+                      src={image}
                       alt={`${room.name} - Image ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      size="detail"
+                      className="rounded-lg"
                     />
                   </div>
                 </CarouselItem>
@@ -234,24 +245,24 @@ const RoomDetail = () => {
             <CardContent className="p-6">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-serif font-semibold mb-2">Book This Room</h3>
+                  <h3 className="text-xl font-serif font-semibold mb-2">Apply for This Room</h3>
                   <p className="text-2xl font-bold text-hotel-gold mb-4">
-                    KSH {room.price} <span className="text-sm text-gray-500 font-normal">/night</span>
+                    KSH {room.price} <span className="text-sm text-gray-500 font-normal">/month</span>
                   </p>
                   <p className="text-sm font-semibold text-gray-600">
-                    Total: KSH {calculateTotalPrice().toLocaleString()} 
+                    Estimated total: KSH {calculateTotalPrice().toLocaleString()} 
                     {checkInDate && checkOutDate && (
-                      <span className="font-normal"> for {Math.max(1, Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)))} night(s)</span>
+                      <span className="font-normal"> for {calculateMonths()} month(s)</span>
                     )}
                   </p>
                 </div>
                 
                 {/* Check-in/out dates */}
                 <div className="space-y-4">
-                  <Label>Select Dates</Label>
+                  <Label>Semester / Stay Period</Label>
                   <div className="grid grid-cols-1 gap-4">
                     <div>
-                      <Label className="text-sm mb-2 block">Check-in</Label>
+                      <Label className="text-sm mb-2 block">Move-in date</Label>
                       <div className="border rounded-md">
                         <Calendar
                           mode="single"
@@ -263,7 +274,7 @@ const RoomDetail = () => {
                       </div>
                     </div>
                     <div>
-                      <Label className="text-sm mb-2 block">Check-out</Label>
+                      <Label className="text-sm mb-2 block">Move-out date</Label>
                       <div className="border rounded-md">
                         <Calendar
                           mode="single"
@@ -279,24 +290,23 @@ const RoomDetail = () => {
                 
                 {/* Guests */}
                 <div className="space-y-2">
-                  <Label>Number of Adults</Label>
+                  <Label>Occupants</Label>
                   <Select value={adults} onValueChange={setAdults}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select number of adults" />
+                      <SelectValue placeholder="Number of students" />
                     </SelectTrigger>
                     <SelectContent>
                       {[...Array(room.capacity)].map((_, i) => (
                         <SelectItem key={i} value={(i + 1).toString()}>
-                          {i + 1} {i === 0 ? 'Adult' : 'Adults'}
+                          {i + 1} {i === 0 ? 'Student' : 'Students'}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 
-                {/* Contact Info */}
                 <div className="space-y-2">
-                  <Label>Contact Information</Label>
+                  <Label>Student Details</Label>
                   <div className="space-y-4">
                     <div>
                       <Label className="text-sm" htmlFor="name">Full Name</Label>
@@ -308,7 +318,25 @@ const RoomDetail = () => {
                       />
                     </div>
                     <div>
-                      <Label className="text-sm" htmlFor="email">Email Address</Label>
+                      <Label className="text-sm" htmlFor="studentId">Student ID / Registration No.</Label>
+                      <Input 
+                        id="studentId" 
+                        placeholder="e.g. STU/2024/001" 
+                        value={studentId}
+                        onChange={(e) => setStudentId(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm" htmlFor="university">University / College</Label>
+                      <Input 
+                        id="university" 
+                        placeholder="e.g. University of Nairobi" 
+                        value={university}
+                        onChange={(e) => setUniversity(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm" htmlFor="email">Student Email</Label>
                       <Input 
                         id="email" 
                         type="email" 
@@ -340,11 +368,11 @@ const RoomDetail = () => {
                   onClick={handleBookRoom}
                   disabled={isBooking || !!emailError}
                 >
-                  {isBooking ? "Processing..." : "Book Now"}
+                  {isBooking ? "Submitting..." : "Submit Application"}
                 </Button>
                 
                 <p className="text-sm text-gray-500 text-center">
-                  No credit card required to book. Pay at hotel.
+                  Applications are reviewed by the warden. Pay fees at the hostel office after approval.
                 </p>
               </div>
             </CardContent>

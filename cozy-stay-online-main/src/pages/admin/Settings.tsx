@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from '@/hooks/use-toast';
-import { Save, Hotel, Clock, CreditCard, ShieldAlert, Loader2 } from 'lucide-react';
+import { Save, Building2, Clock, CreditCard, ShieldAlert, Loader2 } from 'lucide-react';
+import { HOSTEL_NAME, HOSTEL_EMAIL } from '@/constants/brand';
 
 type Settings = Record<string, string>;
 
@@ -63,8 +64,8 @@ const AdminSettings = () => {
   };
 
   const tabs = [
-    { id: 'general',     label: 'General',     icon: <Hotel className="h-4 w-4" /> },
-    { id: 'booking',     label: 'Booking',     icon: <Clock className="h-4 w-4" /> },
+    { id: 'general',     label: 'General',     icon: <Building2 className="h-4 w-4" /> },
+    { id: 'booking',     label: 'Allocations', icon: <Clock className="h-4 w-4" /> },
     { id: 'payment',     label: 'Payment',     icon: <CreditCard className="h-4 w-4" /> },
     { id: 'policy',      label: 'Policy',      icon: <ShieldAlert className="h-4 w-4" /> },
   ];
@@ -107,14 +108,14 @@ const AdminSettings = () => {
       {activeTab === 'general' && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Hotel Information</CardTitle>
-            <CardDescription>Basic details shown to guests</CardDescription>
+            <CardTitle className="text-base">Hostel Information</CardTitle>
+            <CardDescription>Basic details shown to students</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label>Hotel Name</Label>
-                <Input value={settings['hotel_name'] || ''} onChange={e => set('hotel_name', e.target.value)} placeholder="CozyStay" />
+                <Label>Hostel Name</Label>
+                <Input value={settings['hotel_name'] || ''} onChange={e => set('hotel_name', e.target.value)} placeholder={HOSTEL_NAME} />
               </div>
               <div className="space-y-1.5">
                 <Label>Currency</Label>
@@ -122,7 +123,7 @@ const AdminSettings = () => {
               </div>
               <div className="space-y-1.5">
                 <Label>Contact Email</Label>
-                <Input type="email" value={settings['hotel_email'] || ''} onChange={e => set('hotel_email', e.target.value)} placeholder="info@cozystay.com" />
+                <Input type="email" value={settings['hotel_email'] || ''} onChange={e => set('hotel_email', e.target.value)} placeholder={HOSTEL_EMAIL} />
               </div>
               <div className="space-y-1.5">
                 <Label>Phone Number</Label>
@@ -141,8 +142,8 @@ const AdminSettings = () => {
       {activeTab === 'booking' && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Booking Rules</CardTitle>
-            <CardDescription>Check-in/out times and advance booking limits</CardDescription>
+            <CardTitle className="text-base">Allocation Rules</CardTitle>
+            <CardDescription>Move-in/out times and advance application limits</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -155,11 +156,11 @@ const AdminSettings = () => {
                 <Input type="time" value={settings['check_out_time'] || '11:00'} onChange={e => set('check_out_time', e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>Min. Advance Booking (days)</Label>
+                <Label>Min. Advance Application (days)</Label>
                 <Input type="number" min="0" value={settings['min_advance_days'] || '1'} onChange={e => set('min_advance_days', e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>Max. Advance Booking (days)</Label>
+                <Label>Max. Advance Application (days)</Label>
                 <Input type="number" min="1" value={settings['max_advance_days'] || '365'} onChange={e => set('max_advance_days', e.target.value)} />
               </div>
             </div>
@@ -172,11 +173,11 @@ const AdminSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Payment Methods</CardTitle>
-            <CardDescription>Enable or disable payment options for guests</CardDescription>
+            <CardDescription>Enable or disable payment options for students</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {[
-              { key: 'payment_cash',  label: 'Pay at Hotel (Cash)', desc: 'Guests pay when they arrive' },
+              { key: 'payment_cash',  label: 'Pay at Hostel (Cash)', desc: 'Students pay at the hostel office' },
               { key: 'payment_mpesa', label: 'M-Pesa',              desc: 'Mobile money payment' },
               { key: 'payment_card',  label: 'Credit / Debit Card', desc: 'Card payments at reception' },
             ].map(p => (
@@ -197,7 +198,7 @@ const AdminSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Cancellation Policy</CardTitle>
-            <CardDescription>Rules around guest cancellations</CardDescription>
+            <CardDescription>Rules around student application cancellations</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
@@ -209,14 +210,14 @@ const AdminSettings = () => {
                 onChange={e => set('cancellation_policy', e.target.value)}
               />
               <p className="text-xs text-gray-400">
-                Guests can cancel free of charge up to {settings['cancellation_policy'] || '24'} hours before check-in.
+                Students can cancel free of charge up to {settings['cancellation_policy'] || '24'} hours before move-in.
                 Set to 0 to disable free cancellation.
               </p>
             </div>
 
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
               <p className="text-sm text-amber-800">
-                <strong>Current policy:</strong> Guests may cancel bookings up to{' '}
+                <strong>Current policy:</strong> Students may cancel applications up to{' '}
                 <strong>{settings['cancellation_policy'] || '24'} hours</strong> before their scheduled check-in
                 at {settings['check_in_time'] || '14:00'} without penalty.
               </p>

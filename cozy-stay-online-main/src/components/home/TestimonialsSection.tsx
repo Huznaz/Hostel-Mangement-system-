@@ -3,40 +3,41 @@ import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
+import { HOSTEL_NAME } from '@/constants/brand';
 
 const testimonials = [
   {
     id: 1,
-    name: 'Emily Johnson',
-    location: 'New York, USA',
+    name: 'Grace Wanjiru',
+    location: 'University of Nairobi',
     image: '/avatar-1.jpg',
     rating: 5,
-    text: 'Our stay at CozyStay was absolutely perfect! The room was immaculate, staff was friendly and attentive, and the amenities were top-notch. We particularly enjoyed the breakfast - such a wide variety of delicious options!'
+    text: `${HOSTEL_NAME} made my first year so much easier. I applied online, got allocated to Block B, and the wardens are always helpful. The study room is my favourite spot!`,
   },
   {
     id: 2,
-    name: 'David Chen',
-    location: 'Toronto, Canada',
+    name: 'Brian Otieno',
+    location: 'JKUAT',
     image: '/avatar-2.jpg',
     rating: 5,
-    text: 'This hotel exceeded all my expectations. The attention to detail is remarkable - from the welcome drink to the turndown service. The bed was the most comfortable I\'ve ever slept in at a hotel. Will definitely return!'
+    text: 'Affordable dorm bed with reliable WiFi for online classes. The allocation process was straightforward and I could track my application status in my profile.',
   },
   {
     id: 3,
-    name: 'Sophia Martinez',
-    location: 'Miami, USA',
+    name: 'Amina Hassan',
+    location: 'Strathmore University',
     image: '/avatar-3.jpg',
-    rating: 4,
-    text: 'What a beautiful property! The ocean view from our room was breathtaking. The staff went above and beyond to make our anniversary special. My only suggestion would be to extend the pool hours, but overall it was an amazing experience.'
+    rating: 5,
+    text: 'The female-only wing felt safe and well managed. Meals plan is great value and the common kitchen helps when I want to cook on weekends.',
   },
   {
     id: 4,
-    name: 'James Wilson',
-    location: 'London, UK',
+    name: 'Kevin Mutua',
+    location: 'Postgraduate — UoN',
     image: '/avatar-4.jpg',
     rating: 5,
-    text: 'As a frequent business traveler, I\'ve stayed in many hotels, but CozyStay stands out for its excellent service and attention to the needs of business guests. The Executive Business Suite was perfect - quiet, comfortable, and well-equipped.'
-  }
+    text: 'As a postgrad student I needed quiet space. The PG wing allocation was perfect — private room, flexible semester dates, and admin approved my application quickly.',
+  },
 ];
 
 const TestimonialsSection = () => {
@@ -59,17 +60,17 @@ const TestimonialsSection = () => {
     <section className="py-16 bg-hotel-beige">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Guest Experiences</h2>
+          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Student Experiences</h2>
           <div className="w-24 h-1 bg-hotel-gold mx-auto mb-6"></div>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Don't just take our word for it - here's what our guests have to say
+            Hear from students who live and study at {HOSTEL_NAME}
           </p>
         </div>
         
         <div className="relative">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {visibleTestimonials.map((testimonial) => (
-              <Card key={testimonial.id} className="bg-white">
+              <Card key={testimonial.id} className="bg-white shadow-md">
                 <CardContent className="p-6">
                   <div className="flex items-center mb-4">
                     <Avatar className="h-12 w-12 mr-4">
@@ -77,43 +78,37 @@ const TestimonialsSection = () => {
                       <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-medium">{testimonial.name}</h3>
+                      <h4 className="font-semibold">{testimonial.name}</h4>
                       <p className="text-sm text-gray-500">{testimonial.location}</p>
                     </div>
                   </div>
-                  
-                  <div className="flex mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        size={16} 
-                        className={i < testimonial.rating ? "fill-hotel-gold text-hotel-gold" : "text-gray-300"} 
-                      />
+                  <div className="flex mb-3">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-hotel-gold text-hotel-gold" />
                     ))}
                   </div>
-                  
-                  <p className="text-gray-600 italic">"{testimonial.text}"</p>
+                  <p className="text-gray-600 italic">&ldquo;{testimonial.text}&rdquo;</p>
                 </CardContent>
               </Card>
             ))}
           </div>
           
-          {/* Navigation buttons */}
-          <button 
-            onClick={goToPrev} 
-            disabled={currentIndex === 0}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white p-2 rounded-full shadow-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
-          >
-            <ChevronLeft size={24} />
-          </button>
-          
-          <button 
-            onClick={goToNext} 
-            disabled={currentIndex >= testimonials.length - 3}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white p-2 rounded-full shadow-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
-          >
-            <ChevronRight size={24} />
-          </button>
+          <div className="flex justify-center mt-8 gap-4">
+            <button 
+              onClick={goToPrev}
+              disabled={currentIndex === 0}
+              className="p-2 rounded-full bg-white shadow-md disabled:opacity-50"
+            >
+              <ChevronLeft className="h-6 w-6 text-hotel-gold" />
+            </button>
+            <button 
+              onClick={goToNext}
+              disabled={currentIndex >= testimonials.length - 3}
+              className="p-2 rounded-full bg-white shadow-md disabled:opacity-50"
+            >
+              <ChevronRight className="h-6 w-6 text-hotel-gold" />
+            </button>
+          </div>
         </div>
       </div>
     </section>

@@ -24,13 +24,13 @@ const DashboardStats = ({
         iconColorClass="bg-blue-100 text-blue-500"
       />
       <StatsCard
-        title="Active Bookings"
+        title="Active Allocations"
         value={activeBookings}
         icon={BookCheck}
         iconColorClass="bg-green-100 text-green-500"
       />
       <StatsCard
-        title="Pending Bookings"
+        title="Pending Applications"
         value={pendingBookings}
         icon={Clock}
         iconColorClass="bg-yellow-100 text-yellow-500"

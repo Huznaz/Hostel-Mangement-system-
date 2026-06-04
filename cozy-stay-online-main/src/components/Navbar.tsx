@@ -4,6 +4,8 @@ import { Menu, X, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { HOSTEL_NAME } from '@/constants/brand';
+import { adminAppUrl, adminRoute, isFullApp } from '@/config/appMode';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +21,7 @@ const Navbar = () => {
         <div className="flex justify-between h-20">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-serif font-bold text-hotel-gold">CozyStay</span>
+              <span className="text-2xl font-serif font-bold text-hotel-gold">{HOSTEL_NAME}</span>
             </Link>
           </div>
           
@@ -34,15 +36,23 @@ const Navbar = () => {
                 <Link to="/profile">
                   <Button variant="ghost" className="text-foreground hover:text-hotel-gold">
                     <User className="h-4 w-4 mr-2" />
-                    My Bookings
+                    My Allocations
                   </Button>
                 </Link>
                 {isAdmin && (
-                  <Link to="/admin">
-                    <Button variant="outline" className="border-hotel-gold text-hotel-gold hover:bg-hotel-gold hover:text-white">
-                      Admin Dashboard
-                    </Button>
-                  </Link>
+                  isFullApp ? (
+                    <Link to={adminRoute()}>
+                      <Button variant="outline" className="border-hotel-gold text-hotel-gold hover:bg-hotel-gold hover:text-white">
+                        Admin Dashboard
+                      </Button>
+                    </Link>
+                  ) : (
+                    <a href={adminAppUrl} target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" className="border-hotel-gold text-hotel-gold hover:bg-hotel-gold hover:text-white">
+                        Admin Dashboard
+                      </Button>
+                    </a>
+                  )
                 )}
                 <Button 
                   variant="ghost" 
@@ -83,9 +93,13 @@ const Navbar = () => {
           
           {user ? (
             <>
-              <Link to="/profile" className="block px-3 py-2 text-foreground hover:text-hotel-gold">My Bookings</Link>
+              <Link to="/profile" className="block px-3 py-2 text-foreground hover:text-hotel-gold">My Allocations</Link>
               {isAdmin && (
-                <Link to="/admin" className="block px-3 py-2 text-hotel-gold font-medium">Admin Dashboard</Link>
+                isFullApp ? (
+                  <Link to={adminRoute()} className="block px-3 py-2 text-hotel-gold font-medium">Admin Dashboard</Link>
+                ) : (
+                  <a href={adminAppUrl} target="_blank" rel="noopener noreferrer" className="block px-3 py-2 text-hotel-gold font-medium">Admin Dashboard</a>
+                )
               )}
               <button 
                 onClick={signOut}

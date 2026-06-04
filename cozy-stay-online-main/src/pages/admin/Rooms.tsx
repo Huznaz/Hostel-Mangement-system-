@@ -9,6 +9,11 @@ import {
   Search, Plus, Pencil, Trash2, X, BedDouble,
   Users, Star, Utensils, PawPrint, Loader2, Save, ImagePlus
 } from 'lucide-react';
+import RoomImage from '@/components/rooms/RoomImage';
+import {
+  resolveRoomImages,
+  roomImagesNeedSync,
+} from '@/utils/roomImages';
 
 interface Room {
   id: number;
@@ -73,7 +78,22 @@ const AdminRooms = () => {
   const fetchRooms = async () => {
     setLoading(true);
     const { data } = await supabase.from('rooms').select('*').order('id');
-    if (data) setRooms(data as Room[]);
+    if (data) {
+      const normalized = (data as Room[]).map((room) => {
+        const images = resolveRoomImages(room.images, room.id, room.name);
+        return { ...room, images };
+      });
+      setRooms(normalized);
+
+      // One-time repair: persist working URLs when DB still has legacy/broken links
+      void Promise.all(
+        (data as Room[]).map(async (room) => {
+          const images = resolveRoomImages(room.images, room.id, room.name);
+          if (!roomImagesNeedSync(room.images, images)) return;
+          await supabase.from('rooms').update({ images }).eq('id', room.id);
+        }),
+      );
+    }
     setLoading(false);
   };
 
@@ -223,13 +243,7 @@ const AdminRooms = () => {
             return (
               <Card key={room.id} className="overflow-hidden hover:shadow-md transition-shadow">
                 <div className="relative h-40 overflow-hidden bg-gray-100">
-                  {room.images?.[0] ? (
-                    <img src={room.images[0]} alt={room.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300">
-                      <BedDouble className="h-12 w-12" />
-                    </div>
-                  )}
+                  <RoomImage images={room.images} alt={room.name} />
                   <div className="absolute top-2 right-2">
                     <span className={`text-xs font-semibold px-2 py-1 rounded-full ${isBooked ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
                       {isBooked ? 'Occupied' : 'Available'}
@@ -247,7 +261,7 @@ const AdminRooms = () => {
                   <div className="flex items-start justify-between mb-1">
                     <h3 className="font-semibold text-gray-900">{room.name}</h3>
                     <span className="text-sm font-bold text-hotel-gold">
-                      KSH {room.price.toLocaleString()}<span className="text-xs font-normal text-gray-400">/night</span>
+                      KSH {room.price.toLocaleString()}<span className="text-xs font-normal text-gray-400">/month</span>
                     </span>
                   </div>
                   <p className="text-xs text-gray-500 mb-3 line-clamp-2">{room.description}</p>
@@ -319,7 +333,7 @@ const AdminRooms = () => {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>Price per Night (KSH) *</Label>
+                  <Label>Monthly Rent (KSH) *</Label>
                   <Input type="number" min="0" value={form.price} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} placeholder="5000" />
                 </div>
                 <div className="space-y-1.5">
@@ -333,7 +347,7 @@ const AdminRooms = () => {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label>Capacity (guests)</Label>
+                  <Label>Capacity (students)</Label>
                   <Input type="number" min="1" value={form.capacity} onChange={e => setForm(f => ({ ...f, capacity: Number(e.target.value) }))} />
                 </div>
                 <div className="space-y-1.5">
@@ -374,7 +388,7 @@ const AdminRooms = () => {
                 )}
                 {form.images[0] && (
                   <div className="mt-2 h-28 w-full rounded-lg overflow-hidden bg-gray-100">
-                    <img src={form.images[0]} alt="preview" className="h-full w-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                    <RoomImage src={form.images[0]} alt="preview" />
                   </div>
                 )}
               </div>

@@ -24,10 +24,31 @@ export type Database = {
         }
         Relationships: []
       }
+      hotel_settings: {
+        Row: {
+          key: string
+          value: string
+          updated_at: string
+        }
+        Insert: {
+          key: string
+          value: string
+          updated_at?: string
+        }
+        Update: {
+          key?: string
+          value?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           check_in_date: string
           check_out_date: string
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
           created_at: string
           guests: number
           id: string
@@ -36,13 +57,18 @@ export type Database = {
           room_name: string
           special_requests: string | null
           status: string
+          student_id: string | null
           total_price: number
+          university: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           check_in_date: string
           check_out_date: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string
           guests: number
           id?: string
@@ -51,13 +77,18 @@ export type Database = {
           room_name: string
           special_requests?: string | null
           status?: string
+          student_id?: string | null
           total_price: number
+          university?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           check_in_date?: string
           check_out_date?: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string
           guests?: number
           id?: string
@@ -66,9 +97,62 @@ export type Database = {
           room_name?: string
           special_requests?: string | null
           status?: string
+          student_id?: string | null
           total_price?: number
+          university?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      rooms: {
+        Row: {
+          amenities: string[] | null
+          block: string | null
+          breakfast: boolean | null
+          capacity: number | null
+          created_at: string
+          description: string | null
+          featured: boolean | null
+          id: number
+          images: string[] | null
+          name: string
+          pets: boolean | null
+          price: number
+          size: number | null
+          type: string | null
+        }
+        Insert: {
+          amenities?: string[] | null
+          block?: string | null
+          breakfast?: boolean | null
+          capacity?: number | null
+          created_at?: string
+          description?: string | null
+          featured?: boolean | null
+          id?: never
+          images?: string[] | null
+          name: string
+          pets?: boolean | null
+          price?: number
+          size?: number | null
+          type?: string | null
+        }
+        Update: {
+          amenities?: string[] | null
+          block?: string | null
+          breakfast?: boolean | null
+          capacity?: number | null
+          created_at?: string
+          description?: string | null
+          featured?: boolean | null
+          id?: number
+          images?: string[] | null
+          name?: string
+          pets?: boolean | null
+          price?: number
+          size?: number | null
+          type?: string | null
         }
         Relationships: []
       }
@@ -78,6 +162,9 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          phone: string | null
+          student_id: string | null
+          university: string | null
           updated_at: string
           username: string | null
         }
@@ -86,6 +173,9 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          phone?: string | null
+          student_id?: string | null
+          university?: string | null
           updated_at?: string
           username?: string | null
         }
@@ -94,6 +184,9 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          phone?: string | null
+          student_id?: string | null
+          university?: string | null
           updated_at?: string
           username?: string | null
         }
