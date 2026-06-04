@@ -6,7 +6,11 @@ import { useAuth } from '@/hooks/useAuth';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
+import { logAudit } from '@/utils/auditLog';
 import { CalendarDays, Users, BedDouble, Clock, CheckCircle2, XCircle, Hourglass, Receipt } from 'lucide-react';
 
 interface Order {
@@ -35,10 +39,32 @@ const Profile = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState<string | null>(null);
+  const [profileForm, setProfileForm] = useState({
+    full_name: '',
+    student_id: '',
+    university: '',
+    phone: '',
+  });
+  const [savingProfile, setSavingProfile] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     fetchOrders();
+    supabase
+      .from('profiles')
+      .select('full_name, student_id, university, phone')
+      .eq('id', user.id)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setProfileForm({
+            full_name: data.full_name ?? '',
+            student_id: data.student_id ?? '',
+            university: data.university ?? '',
+            phone: data.phone ?? '',
+          });
+        }
+      });
   }, [user]);
 
   const fetchOrders = async () => {
@@ -68,10 +94,36 @@ const Profile = () => {
     if (error) {
       toast({ title: 'Error', description: 'Could not cancel application.', variant: 'destructive' });
     } else {
+      await logAudit('application_cancelled', 'order', orderId);
       toast({ title: 'Application Cancelled', description: 'Your room application has been cancelled.' });
       fetchOrders();
     }
     setCancelling(null);
+  };
+
+  const saveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    setSavingProfile(true);
+    const { error } = await supabase.from('profiles').upsert(
+      {
+        id: user.id,
+        full_name: profileForm.full_name,
+        student_id: profileForm.student_id,
+        university: profileForm.university,
+        phone: profileForm.phone,
+        username: user.email,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'id' },
+    );
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      await logAudit('profile_updated', 'profile', user.id);
+      toast({ title: 'Profile saved' });
+    }
+    setSavingProfile(false);
   };
 
   const formatDate = (d: string) =>
@@ -101,14 +153,68 @@ const Profile = () => {
               {user?.email?.[0].toUpperCase()}
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">{user?.email}</h1>
-              <p className="text-sm text-gray-500">Member since {new Date(user?.created_at || '').toLocaleDateString('en-KE', { month: 'long', year: 'numeric' })}</p>
+              <h1 className="text-xl font-semibold text-gray-900">
+                {profileForm.full_name || user?.email}
+              </h1>
+              <p className="text-sm text-gray-500">{user?.email}</p>
+              <p className="text-xs text-gray-400">Member since {new Date(user?.created_at || '').toLocaleDateString('en-KE', { month: 'long', year: 'numeric' })}</p>
             </div>
           </div>
-          <Button variant="outline" onClick={signOut} className="border-red-200 text-red-600 hover:bg-red-50 self-start sm:self-auto">
-            Sign Out
-          </Button>
+          <div className="flex flex-wrap gap-2 self-start sm:self-auto">
+            <Link to="/notifications">
+              <Button variant="outline" size="sm">Notifications</Button>
+            </Link>
+            <Link to="/messages">
+              <Button variant="outline" size="sm">Messages</Button>
+            </Link>
+            <Button variant="outline" onClick={signOut} className="border-red-200 text-red-600 hover:bg-red-50">
+              Sign Out
+            </Button>
+          </div>
         </div>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-base">Student profile</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={saveProfile} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label>Full name</Label>
+                <Input
+                  value={profileForm.full_name}
+                  onChange={(e) => setProfileForm((p) => ({ ...p, full_name: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label>Student ID</Label>
+                <Input
+                  value={profileForm.student_id}
+                  onChange={(e) => setProfileForm((p) => ({ ...p, student_id: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label>University</Label>
+                <Input
+                  value={profileForm.university}
+                  onChange={(e) => setProfileForm((p) => ({ ...p, university: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label>Phone</Label>
+                <Input
+                  value={profileForm.phone}
+                  onChange={(e) => setProfileForm((p) => ({ ...p, phone: e.target.value }))}
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <Button type="submit" disabled={savingProfile} className="bg-hotel-gold text-white">
+                  {savingProfile ? 'Saving…' : 'Save profile'}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">

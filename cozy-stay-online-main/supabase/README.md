@@ -11,6 +11,7 @@ Run these scripts in the **Supabase Dashboard → SQL Editor**, in order.
 | 4 | `04_admin_user.sql` | Make yourself admin (edit email first) |
 | 5 | `05_realtime.sql` | Enable live updates (optional) |
 | 6 | `06_fix_room_images.sql` | **Admin images blank?** Updates room photo URLs in the database |
+| 7 | `07_features.sql` | **Required** — notifications, messages, audit log, financial records, auto-allocation setting |
 
 If you **already ran** the old hotel SQL and want a **fresh start**, run `00_drop_all.sql` then `01_schema.sql` → `02` → `03` → `04`.
 
@@ -21,7 +22,8 @@ If you want to **keep existing data**, use `upgrade_from_hotel.sql` instead of `
 - Table name `hotel_settings` is kept so the app works without code changes; defaults use **CampusStay**.
 - `orders.user_id` has **no FK** to `auth.users` so guest applications using the placeholder UUID (`00000000-…`) do not fail. Signed-in students should use their real `auth.uid()`.
 - Enable **Realtime** on `orders` and `rooms` in Database → Replication if live updates do not appear.
-- The **public site** uses `src/data/hostelData.ts` for room photos; the **admin** uses the `rooms` table in Supabase. If admin cards show empty images, run `06_fix_room_images.sql` or reload admin (it auto-syncs broken URLs when possible).
+- The **public site** loads rooms from the `rooms` table (falls back to `hostelData.ts` if empty). Run `03_seed.sql` for sample rooms.
+- **Automated allocation**: set `auto_allocate` in Admin → Settings → Allocations (stored in `hotel_settings`).
 
 ## After running SQL
 

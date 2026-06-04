@@ -55,12 +55,14 @@ const AdminGuests = () => {
       .from('orders').select('*').order('created_at', { ascending: false });
 
     const { data: profilesData } = await supabase
-      .from('profiles').select('id, username');
+      .from('profiles').select('id, username, full_name, student_id');
 
     const emailMap: Record<string, string> = {};
+    const studentIdMap: Record<string, string> = {};
     if (profilesData) {
-      profilesData.forEach((p: any) => {
-        emailMap[p.id] = p.username || 'Student';
+      profilesData.forEach((p: { id: string; username: string | null; full_name: string | null; student_id: string | null }) => {
+        emailMap[p.id] = p.full_name || p.username || 'Student';
+        if (p.student_id) studentIdMap[p.id] = p.student_id;
       });
     }
 

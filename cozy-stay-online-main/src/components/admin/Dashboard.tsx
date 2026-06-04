@@ -1,6 +1,7 @@
 
 import { useOrders } from '@/hooks/useOrders';
 import { useBookedRooms } from '@/hooks/useBookedRooms';
+import { useRooms } from '@/hooks/useRooms';
 import { calculateDashboardMetrics, calculateMonthlyData, calculateRoomOccupancy } from '@/utils/dashboardMetrics';
 import DashboardStats from './dashboard/DashboardStats';
 import DashboardCharts from './dashboard/DashboardCharts';
@@ -10,11 +11,11 @@ import GuestStats from './dashboard/GuestStats';
 const Dashboard = () => {
   const { orders, loading: ordersLoading } = useOrders();
   const { bookedRoomIds } = useBookedRooms();
+  const { rooms } = useRooms();
   
-  // Calculate dashboard metrics
-  const metrics = calculateDashboardMetrics(orders, bookedRoomIds);
+  const metrics = calculateDashboardMetrics(orders, bookedRoomIds, rooms.length);
   const { revenueData, bookingData } = calculateMonthlyData(orders);
-  const roomOccupancyData = calculateRoomOccupancy(orders);
+  const roomOccupancyData = calculateRoomOccupancy(orders, rooms);
   
   return (
     <div className="space-y-6">

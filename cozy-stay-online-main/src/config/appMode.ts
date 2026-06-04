@@ -14,7 +14,16 @@ export const adminAppUrl =
 export const userAppUrl =
   import.meta.env.VITE_USER_APP_URL || "http://localhost:8080";
 
-export type AdminSegment = "" | "rooms" | "bookings" | "guests" | "settings";
+export type AdminSegment =
+  | ""
+  | "rooms"
+  | "bookings"
+  | "guests"
+  | "messages"
+  | "reports"
+  | "finance"
+  | "security"
+  | "settings";
 
 export function adminRoute(segment: AdminSegment = ""): string {
   if (isAdminApp) {
@@ -36,12 +45,20 @@ export const adminPageTitle: Record<AdminSegment, string> = {
   rooms: "Room Management",
   bookings: "Allocation Management",
   guests: "Student Management",
+  messages: "Communication",
+  reports: "Reports & Analytics",
+  finance: "Financial Records",
+  security: "Security & Audit",
   settings: "Settings",
 };
 
 export function activeAdminSegment(pathname: string): AdminSegment {
   const segments: AdminSegment[] = [
     "settings",
+    "security",
+    "finance",
+    "reports",
+    "messages",
     "guests",
     "bookings",
     "rooms",

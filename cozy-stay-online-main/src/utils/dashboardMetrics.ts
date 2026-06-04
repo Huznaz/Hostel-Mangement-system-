@@ -1,5 +1,6 @@
 
-import { rooms } from '@/data/hostelData';
+import type { Room } from '@/data/hostelData';
+import { rooms as fallbackRooms } from '@/data/hostelData';
 
 interface Order {
   id: string;
@@ -14,9 +15,13 @@ interface Order {
   room_id: number;
 }
 
-export const calculateDashboardMetrics = (orders: Order[], bookedRoomIds: number[]) => {
-  const totalRooms = rooms.length;
-  const availableRooms = totalRooms - bookedRoomIds.length;
+export const calculateDashboardMetrics = (
+  orders: Order[],
+  bookedRoomIds: number[],
+  totalRoomsCount?: number,
+) => {
+  const totalRooms = totalRoomsCount ?? fallbackRooms.length;
+  const availableRooms = Math.max(0, totalRooms - bookedRoomIds.length);
   const activeBookings = orders.filter(b => b.status === 'confirmed').length;
   const pendingBookings = orders.filter(b => b.status === 'pending').length;
   const totalGuests = orders.filter(b => b.status === 'confirmed')
@@ -37,14 +42,12 @@ export const calculateMonthlyData = (orders: Order[]) => {
   const monthlyRevenue: { [key: string]: number } = {};
   const monthlyBookings: { [key: string]: number } = {};
   
-  // Initialize all months with 0
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   months.forEach(month => {
     monthlyRevenue[month] = 0;
     monthlyBookings[month] = 0;
   });
 
-  // Calculate actual revenue and bookings
   orders.forEach(order => {
     const date = new Date(order.created_at);
     const month = months[date.getMonth()];
@@ -52,7 +55,6 @@ export const calculateMonthlyData = (orders: Order[]) => {
     monthlyBookings[month] += 1;
   });
 
-  // Convert to array format for charts
   const revenueData = months.map(month => ({
     name: month,
     value: monthlyRevenue[month]
@@ -66,19 +68,17 @@ export const calculateMonthlyData = (orders: Order[]) => {
   return { revenueData, bookingData };
 };
 
-export const calculateRoomOccupancy = (orders: Order[]) => {
-  const occupancyMap = new Map();
+export const calculateRoomOccupancy = (orders: Order[], catalog: Room[] = fallbackRooms) => {
+  const occupancyMap = new Map<string, { total: number; booked: number }>();
   
-  // Initialize occupancy for all room types
-  const roomTypes = Array.from(new Set(rooms.map(room => room.type)));
+  const roomTypes = Array.from(new Set(catalog.map(room => room.type)));
   roomTypes.forEach(type => {
     occupancyMap.set(type, {
-      total: rooms.filter(r => r.type === type).length,
+      total: catalog.filter(r => r.type === type).length,
       booked: 0
     });
   });
 
-  // Count current bookings
   const now = new Date().toISOString().slice(0, 10);
   orders
     .filter(order => 
@@ -87,17 +87,16 @@ export const calculateRoomOccupancy = (orders: Order[]) => {
       order.check_out_date >= now
     )
     .forEach(order => {
-      const room = rooms.find(r => r.id === order.room_id);
+      const room = catalog.find(r => r.id === order.room_id);
       if (room) {
-        const data = occupancyMap.get(room.type);
+        const data = occupancyMap.get(room.type)!;
         data.booked += 1;
         occupancyMap.set(room.type, data);
       }
     });
 
-  // Calculate percentages
   return Array.from(occupancyMap.entries()).map(([name, data]) => ({
     name,
-    value: Math.round((data.booked / data.total) * 100) || 0
+    value: data.total > 0 ? Math.round((data.booked / data.total) * 100) : 0
   }));
 };

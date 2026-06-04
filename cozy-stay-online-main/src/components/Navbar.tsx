@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, LogOut, User } from 'lucide-react';
+import { Menu, X, LogOut, User, MessageSquare } from 'lucide-react';
+import NotificationBell from '@/components/NotificationBell';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -33,6 +34,13 @@ const Navbar = () => {
             
             {user ? (
               <>
+                <NotificationBell />
+                <Link to="/messages">
+                  <Button variant="ghost" className="text-foreground hover:text-hotel-gold">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Messages
+                  </Button>
+                </Link>
                 <Link to="/profile">
                   <Button variant="ghost" className="text-foreground hover:text-hotel-gold">
                     <User className="h-4 w-4 mr-2" />
@@ -93,6 +101,8 @@ const Navbar = () => {
           
           {user ? (
             <>
+              <Link to="/notifications" className="block px-3 py-2 text-foreground hover:text-hotel-gold">Notifications</Link>
+              <Link to="/messages" className="block px-3 py-2 text-foreground hover:text-hotel-gold">Messages</Link>
               <Link to="/profile" className="block px-3 py-2 text-foreground hover:text-hotel-gold">My Allocations</Link>
               {isAdmin && (
                 isFullApp ? (

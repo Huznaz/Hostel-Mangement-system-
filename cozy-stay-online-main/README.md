@@ -4,8 +4,11 @@ A web application for managing student hostel rooms, applications, and allocatio
 
 ## Features
 
-- **Students**: Browse rooms/beds, submit semester applications (move-in/out dates), track allocations in profile
-- **Admin**: Dashboard, room CRUD, approve/reject applications, student directory, hostel settings
+- **User management**: Student registration/login, profile (student ID, university, phone), admin login via `admin_users`
+- **Room management**: Unified room catalog from Supabase, real-time availability, automated allocation (instant confirm + alternative room), manual warden approval
+- **Communication**: In-app notifications, student↔management messaging, contact form stored in database
+- **Security**: Row-level security, role-based admin routes, audit log of key actions
+- **Reports & analytics**: Occupancy reports, financial ledger, CSV exports, dashboard charts
 - **Room types**: Dormitories, shared rooms, private rooms, female-only wing, accessible rooms
 
 ## Run locally
@@ -63,3 +66,9 @@ Room catalog: `src/data/hostelData.ts`
 ## Admin access
 
 Users must have a row in the `admin_users` table (id = their auth user UUID) to access `/admin`.
+
+## Supabase setup (required for new features)
+
+In the Supabase SQL Editor, run scripts in order (see `supabase/README.md`), including **`07_features.sql`** for notifications, messages, audit log, and financial records.
+
+Toggle **Automated allocation** under Admin → Settings → Allocations.

@@ -143,9 +143,18 @@ const AdminSettings = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Allocation Rules</CardTitle>
-            <CardDescription>Move-in/out times and advance application limits</CardDescription>
+            <CardDescription>Move-in/out times, advance application limits, and automated allocation</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="flex items-center justify-between p-4 border rounded-lg">
+              <div>
+                <div className="font-medium text-gray-900">Automated allocation</div>
+                <div className="text-sm text-gray-500">
+                  Instantly confirm available rooms and auto-assign alternatives when the preferred room is full
+                </div>
+              </div>
+              <Toggle checked={bool('auto_allocate')} onChange={() => toggle('auto_allocate')} />
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label>Check-in Time</Label>

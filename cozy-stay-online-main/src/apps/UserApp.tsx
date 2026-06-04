@@ -11,6 +11,8 @@ import Contact from "@/pages/Contact";
 import NotFound from "@/pages/NotFound";
 import Auth from "@/pages/Auth";
 import Profile from "@/pages/Profile";
+import Messages from "@/pages/Messages";
+import NotificationsPage from "@/pages/Notifications";
 
 const UserRoutes = () => {
   const { user } = useAuth();
@@ -31,6 +33,22 @@ const UserRoutes = () => {
         element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/messages"
+        element={
+          <ProtectedRoute>
+            <Messages />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <NotificationsPage />
           </ProtectedRoute>
         }
       />

@@ -18,6 +18,12 @@ import BookingsPage from "@/pages/admin/Bookings";
 import AdminRooms from "@/pages/admin/Rooms";
 import AdminGuests from "@/pages/admin/Guests";
 import AdminSettings from "@/pages/admin/Settings";
+import AdminMessages from "@/pages/admin/Messages";
+import AdminReports from "@/pages/admin/Reports";
+import AdminFinance from "@/pages/admin/Finance";
+import AdminSecurity from "@/pages/admin/Security";
+import Messages from "@/pages/Messages";
+import NotificationsPage from "@/pages/Notifications";
 
 const FullRoutes = () => {
   const { user } = useAuth();
@@ -41,6 +47,22 @@ const FullRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/messages"
+        element={
+          <ProtectedRoute>
+            <Messages />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <NotificationsPage />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/admin"
@@ -54,6 +76,10 @@ const FullRoutes = () => {
         <Route path="bookings" element={<BookingsPage />} />
         <Route path="rooms" element={<AdminRooms />} />
         <Route path="guests" element={<AdminGuests />} />
+        <Route path="messages" element={<AdminMessages />} />
+        <Route path="reports" element={<AdminReports />} />
+        <Route path="finance" element={<AdminFinance />} />
+        <Route path="security" element={<AdminSecurity />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>
 

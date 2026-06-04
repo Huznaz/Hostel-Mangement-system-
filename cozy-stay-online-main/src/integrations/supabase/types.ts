@@ -156,6 +156,147 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      financial_records: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          notes: string | null
+          order_id: string | null
+          payment_method: string | null
+          recorded_by: string | null
+          reference: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          payment_method?: string | null
+          recorded_by?: string | null
+          reference?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id?: string | null
+          payment_method?: string | null
+          recorded_by?: string | null
+          reference?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          from_user_id: string | null
+          id: string
+          is_read: boolean
+          sender_email: string | null
+          sender_name: string | null
+          subject: string
+          to_user_id: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          from_user_id?: string | null
+          id?: string
+          is_read?: boolean
+          sender_email?: string | null
+          sender_name?: string | null
+          subject: string
+          to_user_id?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          from_user_id?: string | null
+          id?: string
+          is_read?: boolean
+          sender_email?: string | null
+          sender_name?: string | null
+          subject?: string
+          to_user_id?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          link: string | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

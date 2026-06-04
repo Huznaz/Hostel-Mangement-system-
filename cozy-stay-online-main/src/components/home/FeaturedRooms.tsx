@@ -2,10 +2,11 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { rooms } from '@/data/hostelData';
+import { useRooms } from '@/hooks/useRooms';
 import RoomImage from '@/components/rooms/RoomImage';
 
 const FeaturedRooms = () => {
+  const { rooms, loading } = useRooms();
   const featuredRooms = rooms.filter(room => room.featured);
 
   return (
@@ -19,6 +20,9 @@ const FeaturedRooms = () => {
           </p>
         </div>
         
+        {loading ? (
+          <p className="text-center text-gray-500">Loading rooms…</p>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {featuredRooms.map((room) => (
             <Card key={room.id} className="overflow-hidden transition-all duration-300 hover:shadow-lg">
@@ -64,6 +68,7 @@ const FeaturedRooms = () => {
             </Card>
           ))}
         </div>
+        )}
         
         <div className="text-center mt-10">
           <Link to="/rooms">

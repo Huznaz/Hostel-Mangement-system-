@@ -1,13 +1,17 @@
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import RoomFilters, { FilterValues } from '@/components/rooms/RoomFilters';
 import RoomList from '@/components/rooms/RoomList';
-import { rooms as baseRooms, PRICE_MIN, PRICE_MAX } from '@/data/hostelData';
-import { supabase } from '@/integrations/supabase/client';
+import { useRooms, PRICE_MIN, PRICE_MAX } from '@/hooks/useRooms';
+import { useOrderAvailability } from '@/hooks/useOrderAvailability';
+import { isRoomAvailable } from '@/utils/allocation';
 
 const Rooms = () => {
+  const { rooms, loading: roomsLoading } = useRooms();
+  const { orders, loading: ordersLoading } = useOrderAvailability();
+
   const [filters, setFilters] = useState<FilterValues>({
     priceRange: [PRICE_MIN, PRICE_MAX],
     capacity: 1,
@@ -15,85 +19,30 @@ const Rooms = () => {
     pets: false
   });
 
-  const [bookedRoomIds, setBookedRoomIds] = useState<number[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Fetch orders/booked rooms from Supabase
-    async function fetchBookedRooms() {
-      setLoading(true);
-      try {
-        const now = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-        const { data, error } = await supabase
-          .from('orders')
-          .select('room_id, check_in_date, check_out_date, status')
-          .in('status', ['pending', 'confirmed']);
-        
-        if (error) {
-          console.error("Error fetching booked rooms:", error);
-          setLoading(false);
-          return;
-        }
-        
-        if (data) {
-          // Find rooms that are currently booked for today
-          const booked = data.filter(
-            (order: any) =>
-              order.check_in_date <= now &&
-              order.check_out_date >= now
-          ).map((order: any) => order.room_id);
-          
-          console.log("Currently booked rooms:", booked);
-          setBookedRoomIds(booked);
-        }
-      } catch (err) {
-        console.error("Exception fetching booked rooms:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    
-    fetchBookedRooms();
-    
-    // Set up a subscription for real-time updates
-    const channel = supabase
-      .channel('public:orders')
-      .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'orders'
-        }, 
-        () => {
-          // Refetch booked rooms when orders table changes
-          fetchBookedRooms();
-        }
-      )
-      .subscribe();
-      
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  const loading = roomsLoading || ordersLoading;
 
   const filteredRooms = useMemo(() => {
-    return baseRooms
-      .filter(room => {
-        const matchesPrice =
-          room.price >= filters.priceRange[0] && room.price <= filters.priceRange[1];
-        const matchesCapacity = room.capacity >= filters.capacity;
-        const matchesBreakfast = !filters.breakfast || room.breakfast;
-        const matchesPets = !filters.pets || room.pets;
-        const isBooked = bookedRoomIds.includes(room.id);
-        return (
-          matchesPrice &&
-          matchesCapacity &&
-          matchesBreakfast &&
-          matchesPets &&
-          !isBooked
-        );
-      });
-  }, [filters, bookedRoomIds]);
+    return rooms.filter(room => {
+      const matchesPrice =
+        room.price >= filters.priceRange[0] && room.price <= filters.priceRange[1];
+      const matchesCapacity = room.capacity >= filters.capacity;
+      const matchesBreakfast = !filters.breakfast || room.breakfast;
+      const matchesPets = !filters.pets || room.pets;
+      const availableNow = isRoomAvailable(
+        room.id,
+        new Date().toISOString().slice(0, 10),
+        new Date().toISOString().slice(0, 10),
+        orders,
+      );
+      return (
+        matchesPrice &&
+        matchesCapacity &&
+        matchesBreakfast &&
+        matchesPets &&
+        availableNow
+      );
+    });
+  }, [filters, rooms, orders]);
 
   const handleFilterChange = (newFilters: FilterValues) => {
     setFilters(newFilters);
@@ -102,44 +51,40 @@ const Rooms = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="bg-hotel-beige py-20">
+      
+      <div className="bg-hotel-beige py-16 pt-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-4">Student Rooms & Beds</h1>
+            <h1 className="text-4xl font-serif font-bold mb-4">Available Rooms</h1>
             <div className="w-24 h-1 bg-hotel-gold mx-auto mb-6"></div>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Browse dormitories, shared rooms, and private allocations. Apply online for your semester stay.
             </p>
           </div>
-        </div>
-      </div>
-      <main className="flex-grow py-12 bg-hotel-light-beige">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div className="lg:col-span-1">
               <RoomFilters onFilterChange={handleFilterChange} />
             </div>
+            
             <div className="lg:col-span-3">
-              <h2 className="text-2xl font-serif font-semibold mb-6">
-                {filteredRooms.length} {filteredRooms.length === 1 ? 'Room' : 'Rooms'} Available
-              </h2>
               {loading ? (
-                <div className="flex items-center justify-center py-8">
+                <div className="flex justify-center items-center h-64">
                   <span>Loading available allocations...</span>
                 </div>
-              ) : (
+              ) : filteredRooms.length > 0 ? (
                 <RoomList rooms={filteredRooms} />
-              )}
-              {filteredRooms.length === 0 && !loading && (
-                <div className="text-center py-12 bg-white rounded-lg shadow">
-                  <h3 className="text-xl font-medium text-gray-700 mb-2">No rooms available this semester</h3>
-                  <p className="text-gray-500">Try adjusting your filters or contact the warden for the waitlist.</p>
+              ) : (
+                <div className="bg-white p-8 rounded-lg shadow-md text-center">
+                  <h3 className="text-xl font-medium mb-2">No rooms match your filters</h3>
+                  <p className="text-gray-600">Try adjusting your filters or check back later for availability.</p>
                 </div>
               )}
             </div>
           </div>
         </div>
-      </main>
+      </div>
+      
       <Footer />
     </div>
   );

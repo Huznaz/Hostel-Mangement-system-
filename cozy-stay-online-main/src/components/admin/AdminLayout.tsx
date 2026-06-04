@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Hotel, CalendarDays, Users, 
-  Settings, LogOut, Menu, X
+  Settings, LogOut, Menu, X, MessageSquare, BarChart3,
+  Receipt, Shield,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -55,6 +56,10 @@ const NAV_ITEMS: { segment: AdminSegment; icon: React.ReactNode; label: string }
   { segment: 'rooms', icon: <Hotel size={20} />, label: 'Rooms' },
   { segment: 'bookings', icon: <CalendarDays size={20} />, label: 'Allocations' },
   { segment: 'guests', icon: <Users size={20} />, label: 'Students' },
+  { segment: 'messages', icon: <MessageSquare size={20} />, label: 'Messages' },
+  { segment: 'reports', icon: <BarChart3 size={20} />, label: 'Reports' },
+  { segment: 'finance', icon: <Receipt size={20} />, label: 'Finance' },
+  { segment: 'security', icon: <Shield size={20} />, label: 'Security' },
   { segment: 'settings', icon: <Settings size={20} />, label: 'Settings' },
 ];
 

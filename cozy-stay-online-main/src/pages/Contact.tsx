@@ -10,8 +10,12 @@ import { toast } from '@/hooks/use-toast';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { validateEmail } from '@/utils/emailValidation';
 import { HOSTEL_EMAIL, HOSTEL_PHONE, HOSTEL_LOCATION } from '@/constants/brand';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { logAudit } from '@/utils/auditLog';
 
 const Contact = () => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -40,35 +44,53 @@ const Contact = () => {
     setEmailError(error);
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate email before submission
     const emailValidationError = validateEmail(formData.email);
     if (emailValidationError) {
       setEmailError(emailValidationError);
       return;
     }
 
+    if (!formData.message.trim()) {
+      toast({ title: 'Message required', variant: 'destructive' });
+      return;
+    }
+
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    const { error } = await supabase.from('messages').insert({
+      from_user_id: user?.id ?? null,
+      to_user_id: null,
+      subject: formData.subject.trim() || 'Contact form',
+      body: formData.message.trim(),
+      sender_name: formData.name.trim(),
+      sender_email: formData.email.trim(),
+    });
+
+    if (error) {
+      toast({
+        title: 'Could not send message',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } else {
+      await logAudit('contact_message', 'message', undefined, {
+        subject: formData.subject,
+        from: formData.email,
+      });
       toast({
         title: "Message Sent!",
-        description: "Thank you for contacting us. We'll get back to you soon.",
+        description: user
+          ? "Your message was sent to management. Check Messages for replies."
+          : "Thank you for contacting us. We'll get back to you soon.",
       });
       
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-      });
-      
+      setFormData({ name: '', email: '', subject: '', message: '' });
       setEmailError(null);
-      setIsSubmitting(false);
-    }, 1000);
+    }
+    setIsSubmitting(false);
   };
 
   return (

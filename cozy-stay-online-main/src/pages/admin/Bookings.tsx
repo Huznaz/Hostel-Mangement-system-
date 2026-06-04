@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from '@/hooks/use-toast';
 import { CheckCircle2, XCircle, Clock, Search, Filter, Download, CalendarDays, Users, Receipt } from 'lucide-react';
+import { logAudit } from '@/utils/auditLog';
 
 interface Order {
   id: string;
@@ -55,10 +56,12 @@ const BookingsPage = () => {
 
   const updateStatus = async (id: string, status: string) => {
     setUpdating(id);
+    const order = orders.find((o) => o.id === id);
     const { error } = await supabase.from('orders').update({ status }).eq('id', id);
     if (error) {
       toast({ title: 'Error', description: 'Failed to update allocation.', variant: 'destructive' });
     } else {
+      await logAudit('allocation_status_changed', 'order', id, { status, room_name: order?.room_name });
       toast({ title: `Allocation ${status}`, description: `Application has been ${status}.` });
       setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
     }
